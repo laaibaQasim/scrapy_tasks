@@ -1,9 +1,10 @@
 import asyncio
 import aiohttp
-from bs4 import BeautifulSoup
 import requests
 import re
+from bs4 import BeautifulSoup
 from provinces import get_provinces
+
 
 # global variables
 countries = []
@@ -15,8 +16,8 @@ def set_url_name_flag(rows):
     count_url = 0
 
     for row in rows:
-        a_tag = row.find("a")
-        img_tag = row.find("img")
+        a_tag = row.select_one("td a")
+        img_tag = row.select_one("td span.flagicon img")
 
         if a_tag and img_tag:
             country_link = a_tag["href"]
@@ -33,17 +34,16 @@ def set_url_name_flag(rows):
                 countries[count_url]["name"] = a_tag.text
                 flag_link = img_tag["src"]
                 flag_link = "http:" + flag_link
-                countries[count_url]["images"] = []
-                countries[count_url]["images"].append(flag_link)
+                countries[count_url]["images"] = [flag_link]
                 count_url += 1
 
 
 def get_capital_name(soup):
-    th_tag = soup.find_all("th")
+    th_tags = soup.select("th")
 
-    for tag in th_tag:
-        if "Capital" in tag.text:
-            td_tag = tag.find_next_sibling("td")
+    for th_tag in th_tags:
+        if "Capital" in th_tag.text:
+            td_tag = th_tag.find_next_sibling("td")
 
             if td_tag:
                 a_tag = td_tag.find("a")
@@ -113,8 +113,7 @@ if __name__ == "__main__":
     html_content = response.content
     soup = BeautifulSoup(html_content, "html.parser")
     table = soup.find("table", class_="wikitable sortable")
-    rows = table.find_all("tr")
-
+    rows = table.select("tr")
     set_url_name_flag(rows)
     asyncio.run(main())
 
@@ -123,4 +122,3 @@ if __name__ == "__main__":
         for key, value in country.items():
             print(f"{key}: {value},")
         print("}")
-

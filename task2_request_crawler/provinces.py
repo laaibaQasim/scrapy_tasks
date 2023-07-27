@@ -1,9 +1,21 @@
 import re
-from bs4 import BeautifulSoup
 import requests
+from bs4 import BeautifulSoup
 
 
-def check_string_format(input_string, keywords, country_name):
+col_names = ["Province", "Region", "Name", "State", "name"]
+keywords = [
+    "Provinces",
+    "Regions",
+    "Federative_units",
+    "Federal_units",
+    "States",
+    "Federal_subjects",
+    "Administrative_units",
+]
+
+
+def check_string_format(input_string, country_name):
     keyword_pattern = "|".join(map(re.escape, keywords))
     pattern = rf"\w*/wiki/\w*({keyword_pattern})\w*_of_{country_name}"
     match = re.match(pattern, input_string)
@@ -20,7 +32,6 @@ def request_for_province(url, keyword):
     response = requests.get(url)
     html_content = response.content
     soup = BeautifulSoup(html_content, "html.parser")
-    col_names = ["Province", "Region", "Name", "State", "name"]
     provinces = []
     col_index = 0
 
@@ -75,20 +86,11 @@ def request_for_province(url, keyword):
 
 
 def get_provinces(soup, country_name):
-    keywords = [
-        "Provinces",
-        "Regions",
-        "Federative_units",
-        "Federal_units",
-        "States",
-        "Federal_subjects",
-        "Administrative_units",
-    ]
     a_tags = soup.find_all("a")
     filtered_a_tag = ""
     key = None
     for tag in a_tags:
-        flag, key = check_string_format(tag.get("href", ""), keywords, country_name)
+        flag, key = check_string_format(tag.get("href", ""), country_name)
         if flag:
             filtered_a_tag = tag["href"]
             break
