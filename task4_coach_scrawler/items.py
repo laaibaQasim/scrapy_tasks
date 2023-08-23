@@ -5,7 +5,7 @@ class CoachItem(scrapy.Item):
     skus = scrapy.Field()
     name = scrapy.Field()
     category = scrapy.Field()
-    Link = scrapy.Field()
+    link = scrapy.Field()
     brand = scrapy.Field()
     url_original = scrapy.Field()
     description = scrapy.Field()

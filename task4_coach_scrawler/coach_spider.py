@@ -41,7 +41,7 @@ class CoachSpider(CrawlSpider):
             image_url=fields["ImageUrl"],
             price=fields["Price"],
             currency=fields["Currency"],
-            Link=response.url,
+            link=response.url,
             url_original=response.url,
             crawl_start_time=start_time,
             spider_name=self.name,
